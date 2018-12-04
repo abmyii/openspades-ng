@@ -1072,11 +1072,6 @@ namespace spades {
 		                             spades::Vector3 hitPos) {
 			SPADES_MARK_FUNCTION();
 
-			// Do not display tracers for bullets fired by the local player
-			if (IsFirstPerson(GetCameraMode()) && GetCameraTargetPlayerId() == player->GetId()) {
-				return;
-			}
-
 			float vel;
 			switch (player->GetWeapon()->GetWeaponType()) {
 				case RIFLE_WEAPON: vel = 700.f; break;
