@@ -275,6 +275,7 @@ namespace spades {
 				case SMG_WEAPON: fileName += "-SMG"; break;
 				case RIFLE_WEAPON: fileName += "-Rifle"; break;
 				case SHOTGUN_WEAPON: fileName += "-Shotgun"; break;
+				case PISTOL_WEAPON: fileName += "-Pistol"; break;
 			}
 
 			int numHits = 0;

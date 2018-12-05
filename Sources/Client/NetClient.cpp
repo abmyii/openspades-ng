@@ -990,6 +990,7 @@ namespace spades {
 							case 0: wType = RIFLE_WEAPON; break;
 							case 1: wType = SMG_WEAPON; break;
 							case 2: wType = SHOTGUN_WEAPON; break;
+                            case 3: wType = PISTOL_WEAPON; break;
 							default: SPRaise("Received invalid weapon: %d", weapon);
 						}
 
@@ -1080,6 +1081,7 @@ namespace spades {
 						case 0: wType = RIFLE_WEAPON; break;
 						case 1: wType = SMG_WEAPON; break;
 						case 2: wType = SHOTGUN_WEAPON; break;
+						case 3: wType = PISTOL_WEAPON; break;
 						default: SPRaise("Received invalid weapon: %d", weapon);
 					}
 
@@ -1517,6 +1519,7 @@ namespace spades {
 						case 0: wType = RIFLE_WEAPON; break;
 						case 1: wType = SMG_WEAPON; break;
 						case 2: wType = SHOTGUN_WEAPON; break;
+						case 3: wType = PISTOL_WEAPON; break;
 						default: SPRaise("Received invalid weapon: %d", weapon);
 					}
 					// maybe this command is intended to change local player's
@@ -1575,6 +1578,7 @@ namespace spades {
 				case RIFLE_WEAPON: weapId = 0; break;
 				case SMG_WEAPON: weapId = 1; break;
 				case SHOTGUN_WEAPON: weapId = 2; break;
+				case PISTOL_WEAPON: weapId = 3; break;
 				default: SPInvalidEnum("weapType", weapType);
 			}
 
@@ -1790,6 +1794,7 @@ namespace spades {
 				case RIFLE_WEAPON: wri.Write((uint8_t)0); break;
 				case SMG_WEAPON: wri.Write((uint8_t)1); break;
 				case SHOTGUN_WEAPON: wri.Write((uint8_t)2); break;
+				case PISTOL_WEAPON: wri.Write((uint8_t)3); break;
 			}
 			enet_peer_send(peer, 0, wri.CreatePacket());
 		}

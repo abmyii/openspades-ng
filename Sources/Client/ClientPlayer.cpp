@@ -250,12 +250,16 @@ namespace spades {
 			  "IWeaponSkin@ CreateThirdPersonSMGSkin(Renderer@, AudioDevice@)");
 			static ScriptFunction shotgunFactory(
 			  "IWeaponSkin@ CreateThirdPersonShotgunSkin(Renderer@, AudioDevice@)");
+			static ScriptFunction pistolFactory(
+			  "IWeaponSkin@ CreateThirdPersonPistolSkin(Renderer@, AudioDevice@)");
 			static ScriptFunction rifleViewFactory(
 			  "IWeaponSkin@ CreateViewRifleSkin(Renderer@, AudioDevice@)");
 			static ScriptFunction smgViewFactory(
 			  "IWeaponSkin@ CreateViewSMGSkin(Renderer@, AudioDevice@)");
 			static ScriptFunction shotgunViewFactory(
 			  "IWeaponSkin@ CreateViewShotgunSkin(Renderer@, AudioDevice@)");
+            static ScriptFunction pistolViewFactory(
+			  "IWeaponSkin@ CreateViewPistolSkin(Renderer@, AudioDevice@)");
 			switch (p->GetWeapon()->GetWeaponType()) {
 				case RIFLE_WEAPON:
 					weaponSkin = initScriptFactory(rifleFactory, renderer, audio);
@@ -268,6 +272,10 @@ namespace spades {
 				case SHOTGUN_WEAPON:
 					weaponSkin = initScriptFactory(shotgunFactory, renderer, audio);
 					weaponViewSkin = initScriptFactory(shotgunViewFactory, renderer, audio);
+					break;
+				case PISTOL_WEAPON:
+					weaponSkin = initScriptFactory(pistolFactory, renderer, audio);
+					weaponViewSkin = initScriptFactory(pistolViewFactory, renderer, audio);
 					break;
 				default: SPAssert(false);
 			}
@@ -386,6 +394,10 @@ namespace spades {
 									case SHOTGUN_WEAPON:
 										c = audioDevice->RegisterSound(
 										  "Sounds/Weapons/Shotgun/RaiseLocal.opus");
+										break;
+									case PISTOL_WEAPON:
+										c = audioDevice->RegisterSound(
+										  "Sounds/Weapons/Pistol/RaiseLocal.opus");
 										break;
 								}
 
@@ -1211,6 +1223,14 @@ namespace spades {
 							    ? audioDevice->RegisterSound("Sounds/Weapons/SMG/ShellDrop1.opus")
 							    : audioDevice->RegisterSound("Sounds/Weapons/SMG/ShellDrop2.opus");
 							snd2 = audioDevice->RegisterSound("Sounds/Weapons/SMG/ShellWater.opus");
+							break;
+						case PISTOL_WEAPON:
+							model = renderer->RegisterModel("Models/Weapons/Pistol/Casing.kv6");
+							snd =
+							  SampleRandomBool()
+							    ? audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellDrop1.opus")
+							    : audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellDrop2.opus");
+							snd2 = audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellWater.opus");
 							break;
 					}
 					if (model) {

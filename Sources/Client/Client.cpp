@@ -314,6 +314,9 @@ namespace spades {
 			renderer->RegisterModel("Models/Weapons/Shotgun/Weapon.kv6");
 			renderer->RegisterModel("Models/Weapons/Shotgun/WeaponNoPump.kv6");
 			renderer->RegisterModel("Models/Weapons/Shotgun/Pump.kv6");
+			renderer->RegisterModel("Models/Weapons/Pistol/Weapon.kv6");
+			renderer->RegisterModel("Models/Weapons/Pistol/WeaponNoMagazine.kv6");
+			renderer->RegisterModel("Models/Weapons/Pistol/Magazine.kv6");
 			renderer->RegisterModel("Models/Player/Arm.kv6");
 			renderer->RegisterModel("Models/Player/UpperArm.kv6");
 			renderer->RegisterModel("Models/Player/LegCrouch.kv6");

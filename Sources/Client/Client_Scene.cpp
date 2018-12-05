@@ -131,6 +131,7 @@ namespace spades {
 				case SMG_WEAPON: delta = .8f; break;
 				case RIFLE_WEAPON: delta = 1.4f; break;
 				case SHOTGUN_WEAPON: delta = .4f; break;
+				case PISTOL_WEAPON: delta = 4.f; break;
 			}
 
 			float aimDownState = clientPlayer->GetAimDownState();

@@ -72,6 +72,9 @@ namespace spades {
 			items.push_back(MenuItem(MenuWeaponShotgun,
 			                         AABB2(weapX, firstY + rowHeight * 2.f, menuWidth, menuHeight),
 			                         _Tr("Client", "Shotgun")));
+			items.push_back(MenuItem(MenuWeaponPistol,
+                                     AABB2(weapX, firstY + rowHeight * 3.f, menuWidth, menuHeight),
+			                         _Tr("Client", "Pistol")));
 
 			//! The "Spawn" button that you press when you're ready to "spawn".
 			items.push_back(MenuItem(MenuSpawn,
@@ -115,6 +118,7 @@ namespace spades {
 							case MenuWeaponRifle: selectedWeapon = RIFLE_WEAPON; break;
 							case MenuWeaponSMG: selectedWeapon = SMG_WEAPON; break;
 							case MenuWeaponShotgun: selectedWeapon = SHOTGUN_WEAPON; break;
+							case MenuWeaponPistol: selectedWeapon = PISTOL_WEAPON; break;
 							case MenuSpawn: client->SpawnPressed(); break;
 						}
 					}
@@ -139,6 +143,12 @@ namespace spades {
 				}
 				client->SpawnPressed(); // if we have 3 and are already spec someone wants to spec..
 			}
+            else if ("4" == key) {
+				if (2 != selectedTeam) {
+					selectedWeapon = PISTOL_WEAPON;
+				}
+				client->SpawnPressed(); // if we have 4 and are already spec someone wants to spec..
+			}
 		}
 
 		void LimboView::Update(float dt) {
@@ -152,6 +162,7 @@ namespace spades {
 				switch (item.type) {
 					case MenuWeaponRifle:
 					case MenuWeaponShotgun:
+					case MenuWeaponPistol:
 					case MenuWeaponSMG:
 						if (selectedTeam == 2) {
 							item.visible = false;
@@ -213,6 +224,7 @@ namespace spades {
 					case MenuWeaponRifle:
 					case MenuWeaponSMG:
 					case MenuWeaponShotgun:
+					case MenuWeaponPistol:
 						selected = selectedWeapon == (item.type - 3);
 						index = selectedTeam != 2 ? (1 + (item.type - 3)) : 0;
 						break;

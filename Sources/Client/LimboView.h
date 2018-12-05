@@ -38,6 +38,7 @@ namespace spades {
 				MenuWeaponRifle,
 				MenuWeaponSMG,
 				MenuWeaponShotgun,
+				MenuWeaponPistol,
 				MenuSpawn
 			};
 			struct MenuItem {

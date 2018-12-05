@@ -868,6 +868,7 @@ namespace spades {
 						case RIFLE_WEAPON: cause += _Tr("Client", "Rifle"); break;
 						case SMG_WEAPON: cause += _Tr("Client", "SMG"); break;
 						case SHOTGUN_WEAPON: cause += _Tr("Client", "Shotgun"); break;
+						case PISTOL_WEAPON: cause += "Pistol"; break;
 					}
 					break;
 				case KillTypeFall:
@@ -1077,6 +1078,7 @@ namespace spades {
 				case RIFLE_WEAPON: vel = 700.f; break;
 				case SMG_WEAPON: vel = 360.f; break;
 				case SHOTGUN_WEAPON: return;
+				case PISTOL_WEAPON: vel = 550.f; break;
 			}
 			AddLocalEntity(new Tracer(this, muzzlePos, hitPos, vel));
 			AddLocalEntity(new MapViewTracer(muzzlePos, hitPos, vel));

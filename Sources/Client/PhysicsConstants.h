@@ -39,7 +39,7 @@
 #define MAX_BLOCK_DISTANCE 6
 #define MAX_DIG_DISTANCE 6
 
-enum WeaponType { RIFLE_WEAPON, SMG_WEAPON, SHOTGUN_WEAPON };
+enum WeaponType { RIFLE_WEAPON, SMG_WEAPON, SHOTGUN_WEAPON, PISTOL_WEAPON };
 
 enum BlockActionType {
 	BlockActionCreate,

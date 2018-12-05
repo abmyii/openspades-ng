@@ -280,6 +280,33 @@ namespace spades {
 			float GetSpread() override { return 0.024f; }
 			int GetPelletSize() override { return 8; }
 		};
+		
+		class PistolWeapon3 : public Weapon {
+		public:
+			PistolWeapon3(World *w, Player *p) : Weapon(w, p) {}
+			std::string GetName() override { return "Pistol"; }
+			float GetDelay() override { return 0.5f; }
+			int GetClipSize() override { return 10; }
+			int GetMaxStock() override { return 50; }
+			float GetReloadTime() override { return 2.5f; }
+			bool IsReloadSlow() override { return false; }
+			WeaponType GetWeaponType() override { return PISTOL_WEAPON; }
+			int GetDamage(HitType type, float distance) override {
+				switch (type) {
+					case HitTypeTorso: return 49;
+					case HitTypeHead: return 100;
+					case HitTypeArms: return 33;
+					case HitTypeLegs: return 33;
+					case HitTypeBlock: return 50;
+					default: SPAssert(false); return 0;
+				}
+			}
+			Vector3 GetRecoil() override {
+				return MakeVector3(0.025f, 0.05f, 0.f); // measured
+			}
+			float GetSpread() override { return 0.012f; } // measured (standing, crouched)
+			int GetPelletSize() override { return 1; }
+		};
 
 		class RifleWeapon4 : public Weapon {
 		public:
@@ -369,6 +396,39 @@ namespace spades {
 			float GetSpread() override { return 0.036f; }
 			int GetPelletSize() override { return 8; }
 		};
+		
+		class PistolWeapon4 : public Weapon {
+		public:
+			PistolWeapon4(World *w, Player *p) : Weapon(w, p) {}
+			std::string GetName() override { return "Pistol"; }
+			float GetDelay() override { return 0.6f; }
+			int GetClipSize() override { return 8; }
+			int GetMaxStock() override { return 48; }
+			float GetReloadTime() override { return 2.5f; }
+			bool IsReloadSlow() override { return false; }
+			WeaponType GetWeaponType() override { return PISTOL_WEAPON; }
+			int GetDamage(HitType type, float distance) override {
+				switch (type) {
+					// These are the 0.75 damage values.
+					// To be honest, we don't need this information, as the server decides the
+					// damage.
+					// EXCEPT for blocks, that is.
+					// --GM
+					case HitTypeTorso: return 49;
+					case HitTypeHead: return 100;
+					case HitTypeArms: return 33;
+					case HitTypeLegs: return 33;
+					case HitTypeBlock: return 50;
+					default: SPAssert(false); return 0;
+				}
+			}
+			Vector3 GetRecoil() override {
+				// FIXME: needs to measured
+				return MakeVector3(0.0001f, 0.075f, 0.f);
+			}
+			float GetSpread() override { return 0.004f; }
+			int GetPelletSize() override { return 1; }
+		};
 
 		Weapon *Weapon::CreateWeapon(WeaponType type, Player *p, const GameProperties &gp) {
 			SPADES_MARK_FUNCTION();
@@ -379,6 +439,7 @@ namespace spades {
 						case RIFLE_WEAPON: return new RifleWeapon3(p->GetWorld(), p);
 						case SMG_WEAPON: return new SMGWeapon3(p->GetWorld(), p);
 						case SHOTGUN_WEAPON: return new ShotgunWeapon3(p->GetWorld(), p);
+						case PISTOL_WEAPON: return new PistolWeapon3(p->GetWorld(), p);
 						default: SPInvalidEnum("type", type);
 					}
 				case ProtocolVersion::v076:
@@ -386,6 +447,7 @@ namespace spades {
 						case RIFLE_WEAPON: return new RifleWeapon4(p->GetWorld(), p);
 						case SMG_WEAPON: return new SMGWeapon4(p->GetWorld(), p);
 						case SHOTGUN_WEAPON: return new ShotgunWeapon4(p->GetWorld(), p);
+						case PISTOL_WEAPON: return new PistolWeapon4(p->GetWorld(), p);
 						default: SPInvalidEnum("type", type);
 					}
                 default:

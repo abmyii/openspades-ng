@@ -31,3 +31,6 @@
 #include "SMG/View.as"
 #include "Shotgun/ThirdPerson.as"
 #include "Shotgun/View.as"
+#include "Pistol/ThirdPerson.as"
+#include "Pistol/View.as"
+

@@ -504,6 +504,11 @@ namespace spades {
 							iconHeight = iconWidth / 4.f;
 							spacing = -6.f;
 							break;
+					    case PISTOL_WEAPON:
+							ammoIcon = renderer->RegisterImage("Gfx/Bullet/pistol.png");
+							iconWidth = 6.f;
+							iconHeight = iconWidth * 4.f;
+							break;
 						default: SPInvalidEnum("weap->GetWeaponType()", weap->GetWeaponType());
 					}
 
