@@ -20,22 +20,26 @@
 
 #pragma once
 
+#include <atomic>
 #include <type_traits>
 #include <typeinfo>
 
 #include "Debug.h"
-#include "Mutex.h"
 
 #define DEBUG_REFCOUNTED_OBJECT_LAST_RELEASE 0
+
+#if DEBUG_REFCOUNTED_OBJECT_LAST_RELEASE
+#include <mutex>
+#endif
 
 namespace spades {
 
 	class RefCountedObject {
-		int refCount;
+		std::atomic<int> refCount;
 #if DEBUG_REFCOUNTED_OBJECT_LAST_RELEASE
 		reflection::BacktraceRecord lastRelease;
 		reflection::BacktraceRecord secondLastRelease;
-		Mutex releaseInfoMutex;
+		std::mutex releaseInfoMutex;
 #endif
 	protected:
 		virtual ~RefCountedObject();
@@ -146,11 +150,9 @@ namespace spades {
 		}
 
 		/**
-		* Attempts to cast this `Handle<T>` to `Handle<S>` using `dynamic_cast`.
-		* Throws an exception if the cast was unsuccessful.
-		*/
-		template <class S> Handle<S> Cast() const & {
-			return Handle{*this}.Cast<S>();
-		}
+		 * Attempts to cast this `Handle<T>` to `Handle<S>` using `dynamic_cast`.
+		 * Throws an exception if the cast was unsuccessful.
+		 */
+		template <class S> Handle<S> Cast() const & { return Handle{*this}.Cast<S>(); }
 	};
 }

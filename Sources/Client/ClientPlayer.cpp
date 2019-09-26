@@ -18,14 +18,15 @@
 
  */
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdlib>
 
 #include "CTFGameMode.h"
 #include "Client.h"
 #include "ClientPlayer.h"
 #include "GameMap.h"
-#include "GunCasing.h"
 #include "GunCasing.h"
 #include "IAudioChunk.h"
 #include "IAudioDevice.h"
@@ -107,15 +108,31 @@ namespace spades {
 				}
 			}
 
-			void RenderModel(IModel *model, const ModelRenderParam &p) {
+			void RenderModel(IModel *model, const ModelRenderParam &_p) {
+				ModelRenderParam p = _p;
+
 				if (!model) {
 					SPInvalidArgument("model");
 					return;
 				}
+
 				if (p.depthHack && !allowDepthHack) {
 					OnProhibitedAction();
 					return;
 				}
+
+				// Overbright surfaces bypass the fog
+				p.customColor.x = std::max(std::min(p.customColor.x, 1.0f), 0.0f);
+				p.customColor.y = std::max(std::min(p.customColor.y, 1.0f), 0.0f);
+				p.customColor.z = std::max(std::min(p.customColor.z, 1.0f), 0.0f);
+
+				// NaN values bypass the fog
+				if (std::isnan(p.customColor.x) || std::isnan(p.customColor.y) ||
+				    std::isnan(p.customColor.z)) {
+					OnProhibitedAction();
+					return;
+				}
+
 				auto bounds = (p.matrix * OBB3(model->GetBoundingBox())).GetBoundingAABB();
 				if (CheckVisibility(bounds)) {
 					base->RenderModel(model, p);
@@ -212,6 +229,7 @@ namespace spades {
 			time = 0.f;
 			viewWeaponOffset = MakeVector3(0, 0, 0);
 			lastFront = MakeVector3(0, 0, 0);
+			flashlightOrientation = p->GetFront();
 
 			ScriptContextHandle ctx;
 			IRenderer *renderer = client->GetRenderer();
@@ -323,8 +341,6 @@ namespace spades {
 
 			PlayerInput actualInput = player->GetInput();
 			WeaponInput actualWeapInput = player->GetWeaponInput();
-			Vector3 vel = player->GetVelocty();
-			vel.z = 0.f;
 			if (actualInput.sprint && player->IsAlive()) {
 				sprintState += dt * 4.f;
 				if (sprintState > 1.f)
@@ -465,6 +481,19 @@ namespace spades {
 					softLimitFunc(viewWeaponOffset.x, -limitX, limitX);
 					softLimitFunc(viewWeaponOffset.z, 0, limitY);
 				}
+			}
+
+			{
+				// Smooth the flashlight's movement
+				Vector3 diff = player->GetFront() - flashlightOrientation;
+				float sq = diff.GetLength();
+				if (sq > 0.1) {
+					flashlightOrientation += diff.Normalize() * (sq - 0.1);
+				}
+
+				flashlightOrientation =
+				  Mix(flashlightOrientation, player->GetFront(), 1.0f - powf(1.0e-6, dt))
+				    .Normalize();
 			}
 
 			// FIXME: should do for non-active skins?
@@ -619,6 +648,16 @@ namespace spades {
 			}
 		}
 
+		std::array<Vector3, 3> ClientPlayer::GetFlashlightAxes() {
+			std::array<Vector3, 3> axes;
+
+			axes[2] = flashlightOrientation;
+			axes[0] = Vector3::Cross(flashlightOrientation, player->GetUp()).Normalize();
+			axes[1] = Vector3::Cross(axes[0], axes[2]);
+
+			return axes;
+		}
+
 		void ClientPlayer::AddToSceneFirstPersonView() {
 			Player *p = player;
 			IRenderer *renderer = client->GetRenderer();
@@ -642,9 +681,7 @@ namespace spades {
 				light.radius = 40.f;
 				light.type = DynamicLightTypeSpotlight;
 				light.spotAngle = 30.f * M_PI / 180.f;
-				light.spotAxis[0] = p->GetRight();
-				light.spotAxis[1] = p->GetUp();
-				light.spotAxis[2] = p->GetFront();
+				light.spotAxis = GetFlashlightAxes();
 				light.image = renderer->RegisterImage("Gfx/Spotlight.png");
 				renderer->AddLight(light);
 

@@ -212,12 +212,13 @@ namespace spades {
 					}
 
 					ot += dt;
-					if ((int32_t)dt > 0)
+					if ((int32_t)dt > 0) {
 						view->RunFrame((float)dt / 1000.f);
+						view->RunFrameLate((float)dt / 1000.f);
+					}
 
 					if (view->WantsToBeClosed()) {
 						view->Closing();
-						running = false;
 						SPLog("Close requested by Client");
 						break;
 					}
