@@ -22,7 +22,7 @@
 #include <memory>
 #include <regex>
 
-#if !defined(__APPLE__) && (__unix || __unix__)
+#if (!defined(__APPLE__) && (__unix || __unix__)) || defined(__HAIKU__)
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
@@ -190,11 +190,12 @@ namespace {
 		       binaryName);
 	}
 
+	std::regex const hostNameRegex{"aos://.*"};
+	std::regex const v075Regex{"(?:v=)?0?\\.?75"};
+	std::regex const v076Regex{"(?:v=)?0?\\.?76"};
+
 	int handleCommandLineArgument(int argc, char **argv, int &i) {
 		if (char *a = argv[i]) {
-			static std::regex hostNameRegex{"aos://.*"};
-			static std::regex v075Regex{"(?:v=)?0?\\.?75"};
-			static std::regex v076Regex{"(?:v=)?0?\\.?76"};
 
 			if (std::regex_match(a, hostNameRegex)) {
 				g_autoconnect = true;
@@ -233,9 +234,10 @@ namespace spades {
 		protected:
 			spades::gui::View *CreateView(spades::client::IRenderer *renderer,
 			                              spades::client::IAudioDevice *audio) override {
-				Handle<client::FontManager> fontManager(new client::FontManager(renderer), false);
-				Handle<gui::View> innerView{new spades::client::Client(renderer, audio, addr, fontManager), false};
-				return new spades::gui::ConsoleScreen(renderer, audio, fontManager, std::move(innerView));
+				auto fontManager = Handle<client::FontManager>::New(renderer);
+				auto innerView = Handle<client::Client>::New(renderer, audio, addr, fontManager);
+				return new spades::gui::ConsoleScreen(renderer, audio, fontManager,
+													  std::move(innerView).Cast<gui::View>());
 			}
 
 		public:
@@ -249,9 +251,10 @@ namespace spades {
 		protected:
 			spades::gui::View *CreateView(spades::client::IRenderer *renderer,
 			                              spades::client::IAudioDevice *audio) override {
-				Handle<client::FontManager> fontManager(new client::FontManager(renderer), false);
-				Handle<gui::View> innerView{new spades::gui::MainScreen(renderer, audio, fontManager), false};
-				return new spades::gui::ConsoleScreen(renderer, audio, fontManager, std::move(innerView));
+				auto fontManager = Handle<client::FontManager>::New(renderer);
+				auto innerView = Handle<gui::MainScreen>::New(renderer, audio, fontManager);
+				return new spades::gui::ConsoleScreen(renderer, audio, fontManager,
+				                                      std::move(innerView).Cast<gui::View>());
 			}
 
 		public:
@@ -425,10 +428,8 @@ int main(int argc, char **argv) {
 						SDL_RWops *io = SDL_RWFromFile(
 						  (home + "/.openspades/CONTENT_MOVED_TO_NEW_DIR").c_str(), "wb");
 						if (io != NULL) {
-							const char *text = ("Content of this directory moved to " +
-							                    xdg_data_home + "/openspades")
-							                     .c_str();
-							io->write(io, text, strlen(text), 1);
+							std::string text = ("Content of this directory moved to " + xdg_data_home + "/openspades");
+							io->write(io, text.c_str(), text.length(), 1);
 							io->close(io);
 						}
 					}
@@ -551,12 +552,12 @@ int main(int argc, char **argv) {
 				}
 
 				if (spades::FileManager::FileExists(name.c_str())) {
-					spades::IStream *stream = spades::FileManager::OpenForReading(name.c_str());
-					uLong crc = computeCrc32ForStream(stream);
+					auto stream = spades::FileManager::OpenForReading(name.c_str());
+					uLong crc = computeCrc32ForStream(stream.get());
 
 					stream->SetPosition(0);
 
-					spades::ZipFileSystem *fs = new spades::ZipFileSystem(stream);
+					spades::ZipFileSystem *fs = new spades::ZipFileSystem(stream.release());
 					if (name[0] == '_' && false) { // last resort for #198
 						SPLog("Pak registered: %s: %08lx (marked as 'important')", name.c_str(),
 						      static_cast<unsigned long>(crc));
@@ -603,9 +604,14 @@ int main(int argc, char **argv) {
 		}
 		pumpEvents();
 
+		// make sure the user sees the "pre-release version" text
+		bool forceStartupWindow =
+		  spades::PackageUpdateManager::GetInstance().GetCurrentVersionInfo().build < 4;
+
 		// everything is now ready!
 		if (!g_autoconnect) {
-			if (!((int)cl_showStartupWindow != 0 || splashWindow->IsStartupScreenRequested())) {
+			if (!((int)cl_showStartupWindow != 0 || splashWindow->IsStartupScreenRequested() ||
+			      forceStartupWindow)) {
 				splashWindow.reset();
 
 				SPLog("Starting main screen");

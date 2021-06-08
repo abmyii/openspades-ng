@@ -45,11 +45,22 @@ namespace spades {
 			CTFGameMode();
 			~CTFGameMode();
 
+			CTFGameMode(const CTFGameMode &) = delete;
+			void operator=(const CTFGameMode &) = delete;
+
 			Team &GetTeam(int t);
 			int GetCaptureLimit() { return captureLimit; }
 			void SetCaptureLimit(int v) { captureLimit = v; }
 
 			bool PlayerHasIntel(World &world, Player &player);
+
+			/**
+			 * Resets both team score and the holding status of both flags.
+			 *
+			 * This is what the vanila client does upon receiving a winning
+			 * `IntelCapture`.
+			 */
+			void ResetTeamScoreAndIntelHoldingStatus();
 		};
-	}
-}
+	} // namespace client
+} // namespace spades

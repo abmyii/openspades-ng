@@ -28,12 +28,12 @@
 
 namespace spades {
 	namespace client {
-		Weapon::Weapon(World *w, Player *p)
+		Weapon::Weapon(World &w, Player &p)
 		    : world(w),
 		      owner(p),
 		      time(0),
 		      shooting(false),
-			  shootingPreviously(false),
+		      shootingPreviously(false),
 		      reloading(false),
 		      nextShotTime(0.f),
 		      reloadStartTime(-101.f),
@@ -59,7 +59,7 @@ namespace spades {
 		void Weapon::SetShooting(bool b) { shooting = b; }
 
 		bool Weapon::IsReadyToShoot() {
-			return (ammo > 0 || !owner->IsLocalPlayer()) && time >= nextShotTime &&
+			return (ammo > 0 || !owner.IsLocalPlayer()) && time >= nextShotTime &&
 			       (!reloading || IsReloadSlow());
 		}
 
@@ -72,7 +72,7 @@ namespace spades {
 		bool Weapon::FrameNext(float dt) {
 			SPADES_MARK_FUNCTION();
 
-			bool ownerIsLocalPlayer = owner->IsLocalPlayer();
+			bool ownerIsLocalPlayer = owner.IsLocalPlayer();
 
 			bool fired = false;
 			bool dryFire = false;
@@ -93,8 +93,8 @@ namespace spades {
 						ammo--;
 					}
 
-					if (world->GetListener()) {
-						world->GetListener()->PlayerFiredWeapon(owner);
+					if (world.GetListener()) {
+						world.GetListener()->PlayerFiredWeapon(owner);
 					}
 					nextShotTime += GetDelay();
 				} else if (time >= nextShotTime) {
@@ -128,22 +128,22 @@ namespace spades {
 						slowReloadLeftCount--;
 						if (slowReloadLeftCount > 0)
 							Reload(false);
-						else if (world->GetListener())
-							world->GetListener()->PlayerReloadedWeapon(owner);
+						else if (world.GetListener())
+							world.GetListener()->PlayerReloadedWeapon(owner);
 					} else {
 						if (!ownerIsLocalPlayer) {
 							ammo = GetClipSize();
 						}
-						if (world->GetListener())
-							world->GetListener()->PlayerReloadedWeapon(owner);
+						if (world.GetListener())
+							world.GetListener()->PlayerReloadedWeapon(owner);
 					}
 				}
 			}
 			time += dt;
 
 			if (dryFire && !lastDryFire) {
-				if (world->GetListener())
-					world->GetListener()->PlayerDryFiredWeapon(owner);
+				if (world.GetListener())
+					world.GetListener()->PlayerDryFiredWeapon(owner);
 			}
 			lastDryFire = dryFire;
 			return fired;
@@ -163,7 +163,7 @@ namespace spades {
 		void Weapon::Reload(bool initial) {
 			SPADES_MARK_FUNCTION();
 
-			bool ownerIsLocalPlayer = owner->IsLocalPlayer();
+			bool ownerIsLocalPlayer = owner.IsLocalPlayer();
 
 			if (reloading)
 				return;
@@ -171,7 +171,7 @@ namespace spades {
 			// Is the clip already full?
 			if (ammo >= GetClipSize())
 				return;
-			
+
 			if (ownerIsLocalPlayer) {
 				if (stock == 0)
 					return;
@@ -186,8 +186,8 @@ namespace spades {
 			reloadStartTime = time;
 			reloadEndTime = time + GetReloadTime();
 
-			if (world->GetListener())
-				world->GetListener()->PlayerReloadingWeapon(owner);
+			if (world.GetListener())
+				world.GetListener()->PlayerReloadingWeapon(owner);
 		}
 
 		void Weapon::ForceReloadDone() {
@@ -199,7 +199,7 @@ namespace spades {
 
 		class RifleWeapon3 : public Weapon {
 		public:
-			RifleWeapon3(World *w, Player *p) : Weapon(w, p) {}
+			RifleWeapon3(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Rifle"; }
 			float GetDelay() override { return 0.5f; }
 			int GetClipSize() override { return 10; }
@@ -218,17 +218,17 @@ namespace spades {
 				}
 			}
 			Vector3 GetRecoil() override {
-				return MakeVector3(0.025f, 0.05f, 0.f); // measured
+				return MakeVector3(0.0001f, 0.05f, 0.f);
 			}
-			float GetSpread() override { return 0.012f; } // measured (standing, crouched)
+			float GetSpread() override { return 0.006f; }
 			int GetPelletSize() override { return 1; }
 		};
 
 		class SMGWeapon3 : public Weapon {
 		public:
-			SMGWeapon3(World *w, Player *p) : Weapon(w, p) {}
+			SMGWeapon3(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "SMG"; }
-			float GetDelay() override { return 0.11f; }
+			float GetDelay() override { return 0.1f; }
 			int GetClipSize() override { return 30; }
 			int GetMaxStock() override { return 120; }
 			float GetReloadTime() override { return 2.5f; }
@@ -240,20 +240,20 @@ namespace spades {
 					case HitTypeHead: return 75;
 					case HitTypeArms: return 18;
 					case HitTypeLegs: return 18;
-					case HitTypeBlock: return 35;
+					case HitTypeBlock: return 34;
 					default: SPAssert(false); return 0;
 				}
 			}
 			Vector3 GetRecoil() override {
-				return MakeVector3(0.01f, 0.0125f, 0.f); // measured
+				return MakeVector3(0.00005f, 0.0125f, 0.f);
 			}
-			float GetSpread() override { return 0.025f; } // measured (standing, crouched)
+			float GetSpread() override { return 0.012f; }
 			int GetPelletSize() override { return 1; }
 		};
 
 		class ShotgunWeapon3 : public Weapon {
 		public:
-			ShotgunWeapon3(World *w, Player *p) : Weapon(w, p) {}
+			ShotgunWeapon3(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Shotgun"; }
 			float GetDelay() override { return 1.f; }
 			int GetClipSize() override { return 6; }
@@ -268,19 +268,19 @@ namespace spades {
 					case HitTypeArms: return 16;
 					case HitTypeLegs: return 16;
 					case HitTypeBlock:
-						// Actually, you cast a hit per pallet. This value is a guess, by the way.
+						// Actually, you cast a hit per pallet.
 						// --GM
-						return 34;
+						return 22;
 					default: SPAssert(false); return 0;
 				}
 			}
 			Vector3 GetRecoil() override {
-				return MakeVector3(0.05f, 0.1f, 0.f); // measured
+				return MakeVector3(0.0002f, 0.1f, 0.f);
 			}
 			float GetSpread() override { return 0.024f; }
 			int GetPelletSize() override { return 8; }
 		};
-		
+
 		class PistolWeapon3 : public Weapon {
 		public:
 			PistolWeapon3(World *w, Player *p) : Weapon(w, p) {}
@@ -310,7 +310,7 @@ namespace spades {
 
 		class RifleWeapon4 : public Weapon {
 		public:
-			RifleWeapon4(World *w, Player *p) : Weapon(w, p) {}
+			RifleWeapon4(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Rifle"; }
 			float GetDelay() override { return 0.6f; }
 			int GetClipSize() override { return 8; }
@@ -334,8 +334,7 @@ namespace spades {
 				}
 			}
 			Vector3 GetRecoil() override {
-				// FIXME: needs to measured
-				return MakeVector3(0.0001f, 0.075f, 0.f);
+				return MakeVector3(0.0002f, 0.075f, 0.f);
 			}
 			float GetSpread() override { return 0.004f; }
 			int GetPelletSize() override { return 1; }
@@ -343,7 +342,7 @@ namespace spades {
 
 		class SMGWeapon4 : public Weapon {
 		public:
-			SMGWeapon4(World *w, Player *p) : Weapon(w, p) {}
+			SMGWeapon4(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "SMG"; }
 			float GetDelay() override { return 0.1f; }
 			int GetClipSize() override { return 30; }
@@ -357,12 +356,11 @@ namespace spades {
 					case HitTypeHead: return 75;
 					case HitTypeArms: return 18;
 					case HitTypeLegs: return 18;
-					case HitTypeBlock: return 34;
+					case HitTypeBlock: return 26;
 					default: SPAssert(false); return 0;
 				}
 			}
 			Vector3 GetRecoil() override {
-				// FIXME: needs to measured
 				return MakeVector3(0.00005f, 0.0125f, 0.f);
 			}
 			float GetSpread() override { return 0.012f; }
@@ -371,7 +369,7 @@ namespace spades {
 
 		class ShotgunWeapon4 : public Weapon {
 		public:
-			ShotgunWeapon4(World *w, Player *p) : Weapon(w, p) {}
+			ShotgunWeapon4(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Shotgun"; }
 			float GetDelay() override { return 0.8f; }
 			int GetClipSize() override { return 8; }
@@ -390,13 +388,12 @@ namespace spades {
 				}
 			}
 			Vector3 GetRecoil() override {
-				// FIXME: needs to measured
 				return MakeVector3(0.0002f, 0.075f, 0.f);
 			}
 			float GetSpread() override { return 0.036f; }
 			int GetPelletSize() override { return 8; }
 		};
-		
+
 		class PistolWeapon4 : public Weapon {
 		public:
 			PistolWeapon4(World *w, Player *p) : Weapon(w, p) {}
@@ -430,29 +427,29 @@ namespace spades {
 			int GetPelletSize() override { return 1; }
 		};
 
-		Weapon *Weapon::CreateWeapon(WeaponType type, Player *p, const GameProperties &gp) {
+		Weapon *Weapon::CreateWeapon(WeaponType type, Player &p, const GameProperties &gp) {
 			SPADES_MARK_FUNCTION();
 
 			switch (gp.protocolVersion) {
 				case ProtocolVersion::v075:
 					switch (type) {
-						case RIFLE_WEAPON: return new RifleWeapon3(p->GetWorld(), p);
-						case SMG_WEAPON: return new SMGWeapon3(p->GetWorld(), p);
-						case SHOTGUN_WEAPON: return new ShotgunWeapon3(p->GetWorld(), p);
-						case PISTOL_WEAPON: return new PistolWeapon3(p->GetWorld(), p);
+						case RIFLE_WEAPON: return new RifleWeapon3(p.GetWorld(), p);
+						case SMG_WEAPON: return new SMGWeapon3(p.GetWorld(), p);
+						case SHOTGUN_WEAPON: return new ShotgunWeapon3(p.GetWorld(), p);
+						case PISTOL_WEAPON: return new PistolWeapon3(p.GetWorld(), p);
 						default: SPInvalidEnum("type", type);
 					}
 				case ProtocolVersion::v076:
 					switch (type) {
-						case RIFLE_WEAPON: return new RifleWeapon4(p->GetWorld(), p);
-						case SMG_WEAPON: return new SMGWeapon4(p->GetWorld(), p);
-						case SHOTGUN_WEAPON: return new ShotgunWeapon4(p->GetWorld(), p);
-						case PISTOL_WEAPON: return new PistolWeapon4(p->GetWorld(), p);
+						case RIFLE_WEAPON: return new RifleWeapon4(p.GetWorld(), p);
+						case SMG_WEAPON: return new SMGWeapon4(p.GetWorld(), p);
+						case SHOTGUN_WEAPON: return new ShotgunWeapon4(p.GetWorld(), p);
+						case PISTOL_WEAPON:
+return new PistolWeapon4(p.GetWorld(), p);
 						default: SPInvalidEnum("type", type);
 					}
-                default:
-                    SPInvalidEnum("protocolVersion", gp.protocolVersion);
+				default: SPInvalidEnum("protocolVersion", gp.protocolVersion);
 			}
 		}
-	}
-}
+	} // namespace client
+} // namespace spades
