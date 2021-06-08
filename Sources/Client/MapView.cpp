@@ -470,7 +470,7 @@ namespace spades {
 			Handle<IImage> playerSMG = renderer.RegisterImage("Gfx/Map/SMG.png");
 			Handle<IImage> playerRifle = renderer.RegisterImage("Gfx/Map/Rifle.png");
 			Handle<IImage> playerShotgun = renderer.RegisterImage("Gfx/Map/Shotgun.png");
-			Handle<IImage> playerPistol = renderer->RegisterImage("Gfx/Map/Pistol.png");
+			Handle<IImage> playerPistol = renderer.RegisterImage("Gfx/Map/Pistol.png");
 			Handle<IImage> playerIcon = renderer.RegisterImage("Gfx/Map/Player.png");
 			Handle<IImage> viewIcon = renderer.RegisterImage("Gfx/Map/View.png");
 
@@ -544,9 +544,9 @@ namespace spades {
 						         *playerShotgun, ang);
 					}
 					else if (weapon == WeaponType::PISTOL_WEAPON) {
-						DrawIcon(p->IsSpectator() ? client->freeCameraState.position
-						                          : p->GetPosition(),
-						         playerPistol, ang);
+						DrawIcon(p.IsSpectator() ? client->freeCameraState.position
+						                          : p.GetPosition(),
+						         *playerPistol, ang);
 					}
 				} else { // draw normal color
 					DrawIcon(&p == &focusPlayer ? focusPlayerPos : p.GetPosition(), *playerIcon,

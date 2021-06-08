@@ -120,3 +120,4 @@ ipch/
 *.sln
 *.vcxproj
 OpenSpades.rc
+*.orig

@@ -413,7 +413,7 @@ namespace spades {
 										  "Sounds/Weapons/Shotgun/RaiseLocal.opus");
 										break;
 									case PISTOL_WEAPON:
-										c = audioDevice->RegisterSound(
+										c = audioDevice.RegisterSound(
 										  "Sounds/Weapons/Pistol/RaiseLocal.opus");
 										break;
 								}
@@ -1261,12 +1261,12 @@ namespace spades {
 							snd2 = audioDevice.RegisterSound("Sounds/Weapons/SMG/ShellWater.opus");
 							break;
 						case PISTOL_WEAPON:
-							model = renderer->RegisterModel("Models/Weapons/Pistol/Casing.kv6");
+							model = renderer.RegisterModel("Models/Weapons/Pistol/Casing.kv6");
 							snd =
 							  SampleRandomBool()
-							    ? audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellDrop1.opus")
-							    : audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellDrop2.opus");
-							snd2 = audioDevice->RegisterSound("Sounds/Weapons/Pistol/ShellWater.opus");
+							    ? audioDevice.RegisterSound("Sounds/Weapons/Pistol/ShellDrop1.opus")
+							    : audioDevice.RegisterSound("Sounds/Weapons/Pistol/ShellDrop2.opus");
+							snd2 = audioDevice.RegisterSound("Sounds/Weapons/Pistol/ShellWater.opus");
 							break;
 
 					}

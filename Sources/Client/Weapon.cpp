@@ -283,7 +283,7 @@ namespace spades {
 
 		class PistolWeapon3 : public Weapon {
 		public:
-			PistolWeapon3(World *w, Player *p) : Weapon(w, p) {}
+			PistolWeapon3(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Pistol"; }
 			float GetDelay() override { return 0.5f; }
 			int GetClipSize() override { return 10; }
@@ -396,7 +396,7 @@ namespace spades {
 
 		class PistolWeapon4 : public Weapon {
 		public:
-			PistolWeapon4(World *w, Player *p) : Weapon(w, p) {}
+			PistolWeapon4(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Pistol"; }
 			float GetDelay() override { return 0.6f; }
 			int GetClipSize() override { return 8; }
