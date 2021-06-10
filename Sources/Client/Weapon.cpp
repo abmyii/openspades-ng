@@ -285,10 +285,10 @@ namespace spades {
 		public:
 			PistolWeapon3(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Pistol"; }
-			float GetDelay() override { return 0.5f; }
+			float GetDelay() override { return 0.3f; }
 			int GetClipSize() override { return 10; }
-			int GetMaxStock() override { return 50; }
-			float GetReloadTime() override { return 2.5f; }
+			int GetMaxStock() override { return 60; }
+			float GetReloadTime() override { return 1.f; }
 			bool IsReloadSlow() override { return false; }
 			WeaponType GetWeaponType() override { return PISTOL_WEAPON; }
 			int GetDamage(HitType type, float distance) override {
@@ -302,9 +302,9 @@ namespace spades {
 				}
 			}
 			Vector3 GetRecoil() override {
-				return MakeVector3(0.025f, 0.05f, 0.f); // measured
+				return MakeVector3(0.f, 0.f, 0.f); // measured
 			}
-			float GetSpread() override { return 0.012f; } // measured (standing, crouched)
+			float GetSpread() override { return 0.f; } // measured (standing, crouched)
 			int GetPelletSize() override { return 1; }
 		};
 
@@ -398,10 +398,10 @@ namespace spades {
 		public:
 			PistolWeapon4(World &w, Player &p) : Weapon(w, p) {}
 			std::string GetName() override { return "Pistol"; }
-			float GetDelay() override { return 0.6f; }
-			int GetClipSize() override { return 8; }
-			int GetMaxStock() override { return 48; }
-			float GetReloadTime() override { return 2.5f; }
+			float GetDelay() override { return 0.3f; }
+			int GetClipSize() override { return 10; }
+			int GetMaxStock() override { return 60; }
+			float GetReloadTime() override { return 1.f; }
 			bool IsReloadSlow() override { return false; }
 			WeaponType GetWeaponType() override { return PISTOL_WEAPON; }
 			int GetDamage(HitType type, float distance) override {
@@ -421,9 +421,9 @@ namespace spades {
 			}
 			Vector3 GetRecoil() override {
 				// FIXME: needs to measured
-				return MakeVector3(0.0001f, 0.075f, 0.f);
+				return MakeVector3(0.f, 0.f, 0.f);
 			}
-			float GetSpread() override { return 0.004f; }
+			float GetSpread() override { return 0.f; }
 			int GetPelletSize() override { return 1; }
 		};
 
@@ -444,8 +444,7 @@ namespace spades {
 						case RIFLE_WEAPON: return new RifleWeapon4(p.GetWorld(), p);
 						case SMG_WEAPON: return new SMGWeapon4(p.GetWorld(), p);
 						case SHOTGUN_WEAPON: return new ShotgunWeapon4(p.GetWorld(), p);
-						case PISTOL_WEAPON:
-return new PistolWeapon4(p.GetWorld(), p);
+						case PISTOL_WEAPON: return new PistolWeapon4(p.GetWorld(), p);
 						default: SPInvalidEnum("type", type);
 					}
 				default: SPInvalidEnum("protocolVersion", gp.protocolVersion);
